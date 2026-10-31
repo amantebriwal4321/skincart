@@ -13,7 +13,7 @@ function headers(key: string) {
 
 export async function analyzeSkin(img: Blob, contentType: string, key: string): Promise<SkinOutput[]> {
   // 1. register file, get presigned PUT
-  const meta = await fetch(`${BASE}/s2s/v2.0/file`, {
+  const meta = await fetch(`${BASE}/s2s/v2.0/file/skin-analysis`, {
     method: "POST",
     headers: headers(key),
     body: JSON.stringify({ files: [{ content_type: contentType, file_name: `face.${contentType.split("/")[1] || "jpg"}`, file_size: img.size }] }),

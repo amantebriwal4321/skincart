@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { buildCart, delta } from "@/lib/recommend";
 import type { SkinOutput } from "@/lib/youcam";
 
@@ -13,10 +13,13 @@ export default function Home() {
   const [err, setErr] = useState<string>();
   const [budget, setBudget] = useState(3000);
 
+  const reqId = useRef(0);
   async function scan(f: File) {
+    const id = ++reqId.current;
     setErr(undefined); setBusy(true); setPreview(URL.createObjectURL(f));
     const fd = new FormData(); fd.append("image", f);
     const r = await fetch("/api/analyze", { method: "POST", body: fd }).then((r) => r.json()).catch(() => ({ error: "Network error. Check your connection and try again." }));
+    if (id !== reqId.current) return;
     setBusy(false);
     if (r.error) return setErr(r.error);
     if (out) setPrev(out);

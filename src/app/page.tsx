@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { buildCart, delta } from "@/lib/recommend";
 import type { SkinOutput } from "@/lib/youcam";
+import { prepPhoto } from "@/lib/prep";
 
 export default function Home() {
   const [preview, setPreview] = useState<string>();
@@ -17,7 +18,10 @@ export default function Home() {
   async function scan(f: File) {
     const id = ++reqId.current;
     setErr(undefined); setBusy(true); setPreview(URL.createObjectURL(f));
-    const fd = new FormData(); fd.append("image", f);
+    let img: Blob = f;
+    try { img = (await prepPhoto(f)).blob; } catch { /* unsupported format like HEIC: send as is */ }
+    if (id !== reqId.current) return;
+    const fd = new FormData(); fd.append("image", img, "face.jpg");
     const r = await fetch("/api/analyze", { method: "POST", body: fd }).then((r) => r.json()).catch(() => ({ error: "Network error. Check your connection and try again." }));
     if (id !== reqId.current) return;
     setBusy(false);
@@ -48,7 +52,7 @@ export default function Home() {
             </div>
             <label className="block cursor-pointer rounded-xl bg-rose-600 py-2.5 text-center font-medium text-white hover:bg-rose-700">
               {busy ? "Analysing..." : out ? "Re-scan" : "Upload selfie"}
-              <input type="file" accept="image/jpeg,image/png" capture="user" className="sr-only" disabled={busy} onChange={(e) => e.target.files?.[0] && scan(e.target.files[0])} />
+              <input type="file" accept="image/*" capture="user" className="sr-only" disabled={busy} onChange={(e) => e.target.files?.[0] && scan(e.target.files[0])} />
             </label>
             <p className="mt-2 text-xs text-stone-500">Tip: close-up, front-facing, good light, no glasses or filters. Your face should fill most of the frame.</p>
             <label className="mt-4 block text-sm text-stone-600">Budget: ₹{budget}

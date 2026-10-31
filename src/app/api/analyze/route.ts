@@ -6,6 +6,8 @@ const OK = ["image/jpeg", "image/png"];
 const CLOSEUP = "We couldn't read your face clearly. Try a close-up, well-lit, front-facing photo with your face filling most of the frame.";
 function friendly(m: string) {
   if (/error_src_face_too_small|error_src_face_out_of_bound|error_no_face|face_not_found|error_src_face/i.test(m)) return CLOSEUP;
+  if (/face_angle|pose/i.test(m)) return "Your face is turned or tilted. Look straight at the camera with your head level and try again.";
+  if (/blur|lighting|exposure|dark/i.test(m)) return "The photo is blurry or poorly lit. Try again in even, bright light.";
   if (/error_below_min_image_size/i.test(m)) return "That photo is too low resolution. Use one at least 480px on the short side.";
   if (/error_exceed_max_image_size/i.test(m)) return "That photo is too large. Try a smaller one.";
   if (/timed out/i.test(m)) return "The scan took too long. Please try again in a moment.";

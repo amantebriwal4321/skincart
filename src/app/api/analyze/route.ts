@@ -3,6 +3,12 @@ import { SAMPLE } from "@/lib/sample";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 const OK = ["image/jpeg", "image/png"];
+const CLOSEUP = "We couldn't read your face clearly. Try a close-up, well-lit, front-facing photo with your face filling most of the frame.";
+function friendly(m: string) {
+  if (/face|src_|pose|blur|light|exposure|resolution|size/i.test(m)) return CLOSEUP;
+  if (/timed out/i.test(m)) return "The scan took too long. Please try again in a moment.";
+  return "Skin scan failed. Please try again with a clear, close-up selfie.";
+}
 
 export async function POST(req: Request) {
   const fd = await req.formData().catch(() => null);
@@ -15,6 +21,7 @@ export async function POST(req: Request) {
   try {
     return Response.json({ demo: false, output: await analyzeSkin(file, file.type, key) });
   } catch (e) {
-    return Response.json({ error: (e as Error).message }, { status: 502 });
+    console.error("youcam", (e as Error).message);
+    return Response.json({ error: friendly((e as Error).message) }, { status: 422 });
   }
 }

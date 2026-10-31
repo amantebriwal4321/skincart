@@ -16,7 +16,7 @@ export default function Home() {
   async function scan(f: File) {
     setErr(undefined); setBusy(true); setPreview(URL.createObjectURL(f));
     const fd = new FormData(); fd.append("image", f);
-    const r = await fetch("/api/analyze", { method: "POST", body: fd }).then((r) => r.json()).catch(() => ({ error: "network" }));
+    const r = await fetch("/api/analyze", { method: "POST", body: fd }).then((r) => r.json()).catch(() => ({ error: "Network error. Check your connection and try again." }));
     setBusy(false);
     if (r.error) return setErr(r.error);
     if (out) setPrev(out);
@@ -47,6 +47,7 @@ export default function Home() {
               {busy ? "Analysing..." : out ? "Re-scan" : "Upload selfie"}
               <input type="file" accept="image/jpeg,image/png" capture="user" className="sr-only" disabled={busy} onChange={(e) => e.target.files?.[0] && scan(e.target.files[0])} />
             </label>
+            <p className="mt-2 text-xs text-stone-500">Tip: close-up, front-facing, good light, no glasses or filters. Your face should fill most of the frame.</p>
             <label className="mt-4 block text-sm text-stone-600">Budget: ₹{budget}
               <input type="range" min={1000} max={6000} step={250} value={budget} onChange={(e) => setBudget(+e.target.value)} className="w-full accent-rose-600" />
             </label>

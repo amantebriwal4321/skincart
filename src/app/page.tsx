@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { buildCart, delta } from "@/lib/recommend";
 import type { SkinOutput } from "@/lib/youcam";
 import { prepPhoto } from "@/lib/prep";
+import { SandboxCheckout } from "@/components/SandboxCheckout";
 
 export default function Home() {
   const [preview, setPreview] = useState<string>();
@@ -40,7 +41,7 @@ export default function Home() {
         <header className="mb-8 flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">SkinCart</h1>
-            <p className="text-stone-600">Scan your face. Get a cart that fits your skin and your budget.</p>
+            <p className="text-stone-600">Scan your face. Review an AI routine that fits your budget, then approve PayPal sandbox checkout yourself.</p>
           </div>
           {demo && <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">demo data, add YOUCAM_API_KEY</span>}
         </header>
@@ -89,6 +90,7 @@ export default function Home() {
                   </ul>
                   {plan.warnings.map((w) => <p key={w} className="mt-3 rounded-lg bg-amber-50 p-2 text-sm text-amber-800">{w}</p>)}
                 </div>
+                <SandboxCheckout lines={plan.cart.map((p) => ({ id: p.id, name: p.name }))} demo={demo} />
               </>
             ) : (
               <div className="grid h-full place-items-center rounded-2xl border-2 border-dashed border-stone-200 p-10 text-center text-stone-500">Upload a front facing selfie in good light. Results show up here.</div>
